@@ -1,8 +1,8 @@
 type Merge<T> = { [key in keyof T]: T[key] }
-type ResolvedPromiseIndex<TState extends { [K: string]: Promise<any>}> = 
-{
-  [K in keyof TState]: Awaited<TState[K]>;
-}
+type ResolvedPromiseIndex<TState extends { [K: string]: Promise<any> }> =
+  {
+    [K in keyof TState]: Awaited<TState[K]>;
+  }
 type ResolvedPromiseIndexWithError<TState extends { [K: string]: Promise<any> }> = ResolvedPromiseIndex<TState> & { errors: any[] };
 
 function isKeySetGuard(arg: any): arg is { keys: string[] } {
@@ -41,17 +41,13 @@ async function settleAndResolve<
   return result;
 }
 
-const z = settleAndResolve({
+const result = await settleAndResolve({
   alpha: Promise.resolve(1),
   beta: Promise.resolve('b'),
   delta: Promise.resolve({ waffles: 1231421 }),
   gamma: Promise.reject<string>(Error('boom')),
 });
-z.then((v) => {
-  console.log(v.alpha, v.beta, v.delta, v.gamma, v.errors);
-}).catch(v => console.error('Result: ', v.errors));
-z.then(console.log);
-
+console.log(result);
 
 // This section for type investigation
 type AsyncDefinition = {
@@ -62,3 +58,5 @@ type AsyncDefinition = {
 }
 type OutputObjectDefinition = ResolvedPromiseIndexWithError<AsyncDefinition>
 type Flattened = Merge<OutputObjectDefinition>;
+
+export { }

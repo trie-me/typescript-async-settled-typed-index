@@ -3,6 +3,12 @@
 ### Running
 
 ```
+# bootstrap
 npm i
-npx ts-node index.ts
+
+# auto
+npm start
+
+# manual/targeted
+npx ts-node-esm index.ts
 ```
