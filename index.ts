@@ -1,4 +1,3 @@
-type Merge<T> = { [key in keyof T]: T[key] }
 type PromiseIndex = { [K: string]: Promise<any> }
 type AwaitedThen<TState extends PromiseIndex> = Promise<Awaited<TState[keyof TState]>>
 type ResolvedPromiseIndex<TState extends PromiseIndex> =
@@ -8,17 +7,15 @@ type PromiseIndexKVP<TState extends PromiseIndex> = [keyof TState, AwaitedThen<T
 
 async function settleAndResolve<TState extends PromiseIndex
 >(promiseIndex: TState): Promise<ResolvedPromiseIndexWithError<TState>> {
-  return (await Promise.allSettled(Object.entries(promiseIndex)
-    .map(
-      ([key, value]: PromiseIndexKVP<TState>) =>
-        value.then(value => [key, value] as const)
-    ))).reduce((acc, val) => {
-      if (val?.status === 'fulfilled') {
-        const [key, value] = val.value;
-        acc[key] = value
-      } else acc.errors.push(val.reason);
-      return acc;
-    },{ errors: [] } as ResolvedPromiseIndexWithError<TState>);
+  return (await Promise.allSettled(Object.entries(promiseIndex).map(
+    ([key, value]: PromiseIndexKVP<TState>) => value.then(value => [key, value] as const)
+  ))).reduce((acc, val) => {
+    if (val?.status === 'fulfilled') {
+      const [key, value] = val.value;
+      acc[key] = value
+    } else acc.errors.push(val.reason);
+    return acc;
+  }, { errors: [] } as ResolvedPromiseIndexWithError<TState>);
 }
 
 const result = await settleAndResolve({
@@ -30,6 +27,8 @@ const result = await settleAndResolve({
 console.log(result);
 
 // This section for type investigation
+type Merge<T> = { [key in keyof T]: T[key] }
+
 type AsyncDefinition = {
   alpha: Promise<number>,
   beta: Promise<string>,
